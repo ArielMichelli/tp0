@@ -43,7 +43,6 @@ int main(void)
 	/* ---------------- LEER DE CONSOLA ---------------- */
 
 	leer_consola(logger);
-	leer_consola(logger);
 
 	/*---------------------------------------------------PARTE 3-------------------------------------------------------------*/
 
@@ -66,21 +65,23 @@ int main(void)
 t_log* iniciar_logger(void)
 {
 	t_log* nuevo_logger;
-
-	if( (nuevo_logger = log_create("tp0.log","TP0",1,LOG_LEVEL_INFO)) == NULL){
-		printf("Hubo un error al crear el Logger");
+	nuevo_logger = log_create("tp0.log","TP0",1,LOG_LEVEL_INFO);
+	if(nuevo_logger  == NULL){
+		printf("Hubo un error al crear el Logger \n");
+		//abort();
 		exit(1);
-	}
-
+		}
+		
 	return nuevo_logger;
 }
 
 t_config* iniciar_config(void)
 {
 	t_config* nuevo_config;
-
-	if( (nuevo_config = config_create("./cliente.config")) == NULL){
+	nuevo_config = config_create("./cliente.config") ;
+	if(nuevo_config  == NULL){
 		printf("Hubo un error al crear el Archivo de Config");
+		//abort();
 		exit(2);
 	}
 
@@ -91,12 +92,26 @@ void leer_consola(t_log* logger)
 {
 	char* leido;
 
-	// La primera te la dejo de yapa
-	leido = readline("> ");
+	//  La primera te la dejo de yapa
+	// leido = readline("> ");
 
 	// El resto, las vamos leyendo y logueando hasta recibir un string vacío
+	while(1){
+		leido = readline("> ");
 
-
+		if (leido) {
+            add_history(leido);
+			log_info(logger,"Lei por pantalla: %s", leido);
+        }
+        //if (!strncmp(leido, "", 4)) {
+		if (!strcmp(leido, "")) {
+            free(leido);
+            break;
+        }
+        printf("%s\n", leido);
+        free(leido);
+	}
+	return(0);
 	// ¡No te olvides de liberar las lineas antes de regresar!
 
 }
