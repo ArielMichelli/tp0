@@ -52,21 +52,17 @@ int main(void)
 	conexion = crear_conexion(ip, puerto);
 	log_info(logger,"El puerto de conexion es: %i",conexion);
 	// Enviamos al servidor el valor de CLAVE como mensaje
-	size_t bytes;
-	int32_t handshake = 1;
-	int32_t result;
-
-	bytes = send(conexion, &handshake, sizeof(int32_t), 0);
-	bytes = recv(conexion, &result, sizeof(int32_t), MSG_WAITALL);
+	enviar_mensaje("Hola soy un mensaje de prueba",conexion);
 
 	// Armamos y enviamos el paquete
 	paquete(conexion);
 
+	// Liberamos todo al terminar el programa:
 	terminar_programa(conexion, logger, config);
 
 
 	/*---------------------------------------------------PARTE 5-------------------------------------------------------------*/
-	
+	printf("\n El Cliente Termino...");
 }
 
 t_log* iniciar_logger(void)
@@ -126,16 +122,34 @@ void leer_consola(t_log* logger)
 void paquete(int conexion)
 {
 	// Ahora toca lo divertido!
-	char* leido;
-	t_paquete* paquete;
-
-	// Leemos y esta vez agregamos las lineas al paquete
+	char* leido_para_paquete;
+	t_paquete* paquete = crear_paquete();
 
 
+	leido_para_paquete = readline("> ");
+	while(strcmp(leido_para_paquete, "") != 0){
+			agregar_a_paquete(paquete,leido_para_paquete, strlen(leido_para_paquete) + 1 );
+			free(leido_para_paquete);
+			leido_para_paquete = readline("> ");
+	}
+	// while(1){
+	// 	leido_para_paquete = readline("> ");
+
+	// 	if (leido_para_paquete) {
+    //         agregar_a_paquete(paquete,leido_para_paquete, strlen(leido_para_paquete) + 1 );
+    //     }
+	// 	if (!strcmp(leido_para_paquete, "")) {
+    //         free(leido_para_paquete);
+    //         break;
+    //     }
+
+	//} 
 	// ¡No te olvides de liberar las líneas y el paquete antes de regresar!
-	
+	   enviar_paquete(paquete,conexion);
+	   eliminar_paquete(paquete);
 }
 
+// LIBERO LOS ESPACIOS DE MEMORIA:
 void terminar_programa(int conexion, t_log* logger, t_config* config)
 {
 	/* Y por ultimo, hay que liberar lo que utilizamos (conexion, log y config) 
