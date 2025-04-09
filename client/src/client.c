@@ -50,16 +50,23 @@ int main(void)
 
 	// Creamos una conexión hacia el servidor
 	conexion = crear_conexion(ip, puerto);
-
+	log_info(logger,"El puerto de conexion es: %i",conexion);
 	// Enviamos al servidor el valor de CLAVE como mensaje
+	size_t bytes;
+	int32_t handshake = 1;
+	int32_t result;
+
+	bytes = send(conexion, &handshake, sizeof(int32_t), 0);
+	bytes = recv(conexion, &result, sizeof(int32_t), MSG_WAITALL);
 
 	// Armamos y enviamos el paquete
 	paquete(conexion);
 
 	terminar_programa(conexion, logger, config);
 
+
 	/*---------------------------------------------------PARTE 5-------------------------------------------------------------*/
-	// Proximamente
+	
 }
 
 t_log* iniciar_logger(void)
@@ -108,7 +115,7 @@ void leer_consola(t_log* logger)
             free(leido);
             break;
         }
-        printf("%s\n", leido);
+
         free(leido);
 	}
 	return(0);
